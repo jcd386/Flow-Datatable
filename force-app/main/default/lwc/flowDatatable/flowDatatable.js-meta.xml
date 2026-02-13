@@ -97,20 +97,35 @@
                       description="Display a row number column"
                       default="false" />
 
-            <!-- Input: Header font size -->
+            <!-- Input: Header row height -->
+            <property name="headerRowHeight"
+                      type="String"
+                      role="inputOnly"
+                      label="Header Row Height (px)"
+                      description="Height of the column header row in pixels. Text auto-scales to fit. Defaults to 32."
+                      default="32" />
+
+            <!-- Input: Data row height -->
+            <property name="rowHeight"
+                      type="String"
+                      role="inputOnly"
+                      label="Data Row Height (px)"
+                      description="Height of each data row in pixels. Text auto-scales to fit. Defaults to 32."
+                      default="32" />
+
+            <!-- Deprecated: kept for backward compatibility with existing flows -->
             <property name="headerFontSize"
                       type="String"
                       role="inputOnly"
-                      label="Header Font Size (px)"
-                      description="Font size for column headers in pixels. Defaults to 12."
+                      label="Header Font Size (deprecated)"
+                      description="Deprecated. Use Header Row Height instead."
                       default="12" />
 
-            <!-- Input: Row font size -->
             <property name="rowFontSize"
                       type="String"
                       role="inputOnly"
-                      label="Row Font Size (px)"
-                      description="Font size for data rows in pixels. Defaults to 13."
+                      label="Row Font Size (deprecated)"
+                      description="Deprecated. Use Data Row Height instead."
                       default="13" />
 
             <!-- Output: Selected records -->

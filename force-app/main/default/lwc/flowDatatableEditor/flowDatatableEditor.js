@@ -75,8 +75,8 @@ export default class FlowDatatableEditor extends LightningElement {
     showSearch = true;
     headerText = '';
     showRowNumbers = false;
-    headerFontSize = 12;
-    rowFontSize = 13;
+    headerRowHeight = 32;
+    rowHeight = 32;
 
     // ─────────────────────────────────────────────────────────────────
     // Initialization
@@ -105,11 +105,11 @@ export default class FlowDatatableEditor extends LightningElement {
         const rowsVal = this._getInputValue('visibleRows');
         this.visibleRows = rowsVal != null && rowsVal !== '' ? parseInt(rowsVal, 10) : 10;
 
-        const hFontVal = this._getInputValue('headerFontSize');
-        this.headerFontSize = hFontVal != null && hFontVal !== '' ? parseInt(hFontVal, 10) : 12;
+        const hHeightVal = this._getInputValue('headerRowHeight');
+        this.headerRowHeight = hHeightVal != null && hHeightVal !== '' ? parseInt(hHeightVal, 10) : 32;
 
-        const rFontVal = this._getInputValue('rowFontSize');
-        this.rowFontSize = rFontVal != null && rFontVal !== '' ? parseInt(rFontVal, 10) : 13;
+        const dHeightVal = this._getInputValue('rowHeight');
+        this.rowHeight = dHeightVal != null && dHeightVal !== '' ? parseInt(dHeightVal, 10) : 32;
 
         // Parse columns from fieldNames + columnLabels + editableFields
         const fieldNamesStr = this._getInputValue('fieldNames') || '';
@@ -504,16 +504,16 @@ export default class FlowDatatableEditor extends LightningElement {
         this._dispatchChange('headerText', this.headerText, 'String');
     }
 
-    handleHeaderFontSizeChange(event) {
+    handleHeaderRowHeightChange(event) {
         const val = event.detail.value;
-        this.headerFontSize = val ? parseInt(val, 10) : 12;
-        this._dispatchChange('headerFontSize', String(this.headerFontSize), 'String');
+        this.headerRowHeight = val ? parseInt(val, 10) : 32;
+        this._dispatchChange('headerRowHeight', String(this.headerRowHeight), 'String');
     }
 
-    handleRowFontSizeChange(event) {
+    handleRowHeightChange(event) {
         const val = event.detail.value;
-        this.rowFontSize = val ? parseInt(val, 10) : 13;
-        this._dispatchChange('rowFontSize', String(this.rowFontSize), 'String');
+        this.rowHeight = val ? parseInt(val, 10) : 32;
+        this._dispatchChange('rowHeight', String(this.rowHeight), 'String');
     }
 
     // ─────────────────────────────────────────────────────────────────

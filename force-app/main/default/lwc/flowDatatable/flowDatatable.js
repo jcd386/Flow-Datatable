@@ -22,8 +22,10 @@ export default class FlowDatatable extends NavigationMixin(LightningElement) {
     @api showSearch = false;
     @api headerText = '';
     @api showRowNumbers = false;
-    @api headerFontSize = '12';
-    @api rowFontSize = '13';
+    @api headerRowHeight = '32';
+    @api rowHeight = '32';
+    @api headerFontSize; // deprecated, kept for backward compat
+    @api rowFontSize;    // deprecated, kept for backward compat
 
     // Flow outputs
     @api selectedRecords = [];
@@ -117,9 +119,11 @@ export default class FlowDatatable extends NavigationMixin(LightningElement) {
     }
 
     get tableContainerStyle() {
-        const hSize = this.headerFontSize || '12';
-        const rSize = this.rowFontSize || '13';
-        return `--header-font-size:${hSize}px;--row-font-size:${rSize}px`;
+        const hHeight = parseInt(this.headerRowHeight, 10) || 32;
+        const dHeight = parseInt(this.rowHeight, 10) || 32;
+        const hFont = Math.round(hHeight * 0.4);
+        const dFont = Math.round(dHeight * 0.45);
+        return `--header-row-height:${hHeight}px;--data-row-height:${dHeight}px;--header-font-size:${hFont}px;--row-font-size:${dFont}px`;
     }
 
     _adjustTableHeight() {

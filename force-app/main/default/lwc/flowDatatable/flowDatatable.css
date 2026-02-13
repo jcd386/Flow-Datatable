@@ -21,13 +21,21 @@
     background-color: #fafaf9;
 }
 
-/* ── Font Size (driven by custom properties on .table-container) ── */
+/* ── Row Height & Font Size (driven by custom properties on .table-container) ── */
 .table-container thead th {
-    font-size: var(--header-font-size, 12px);
+    height: var(--header-row-height, 32px);
+    font-size: var(--header-font-size, 13px);
+    padding-top: 0;
+    padding-bottom: 0;
+    vertical-align: middle;
 }
 
 .table-container tbody td {
-    font-size: var(--row-font-size, 13px);
+    height: var(--data-row-height, 32px);
+    font-size: var(--row-font-size, 14px);
+    padding-top: 0;
+    padding-bottom: 0;
+    vertical-align: middle;
 }
 
 /* ── Sortable Headers ── */
