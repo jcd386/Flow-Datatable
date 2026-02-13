@@ -1,0 +1,146 @@
+/* ─────────────────────────────────────────────────────────────
+   Flow Datatable - Component Styles
+   ───────────────────────────────────────────────────────────── */
+
+:host {
+    display: block;
+}
+
+/* ── Table Container ── */
+.table-container {
+    border: 1px solid #d8dde6;
+    border-radius: 4px;
+    overflow-y: auto;
+}
+
+/* ── Sticky Header ── */
+.table-container thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background-color: #fafaf9;
+}
+
+/* ── Font Size (driven by custom properties on .table-container) ── */
+.table-container thead th {
+    font-size: var(--header-font-size, 12px);
+}
+
+.table-container tbody td {
+    font-size: var(--row-font-size, 13px);
+}
+
+/* ── Sortable Headers ── */
+.slds-is-sortable {
+    cursor: pointer;
+    user-select: none;
+}
+
+.slds-is-sortable:hover {
+    background-color: #f3f3f3;
+}
+
+.sort-icon {
+    margin-left: 0.25rem;
+    flex-shrink: 0;
+}
+
+.sort-icon-hidden {
+    visibility: hidden;
+}
+
+.slds-is-sortable:hover .sort-icon-hidden {
+    visibility: visible;
+    opacity: 0.4;
+}
+
+/* ── Row Styles ── */
+.row-selectable {
+    cursor: pointer;
+}
+
+.row-selectable:hover {
+    background-color: #f3f3f3;
+}
+
+.row-selected {
+    background-color: #eef4ff;
+}
+
+.row-selected:hover {
+    background-color: #ddeaff;
+}
+
+/* ── Cell Styles ── */
+.cell-value {
+    min-height: 1.5rem;
+}
+
+.cell-display {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.25rem;
+}
+
+.cell-display-value {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.cell-editable {
+    cursor: pointer;
+    position: relative;
+}
+
+.cell-editable:hover {
+    background-color: #fffbeb;
+}
+
+.pencil-icon {
+    flex-shrink: 0;
+    opacity: 0;
+    transition: opacity 0.15s;
+}
+
+.cell-editable:hover .pencil-icon {
+    opacity: 0.6;
+}
+
+.pencil-icon:hover {
+    opacity: 1;
+}
+
+.cell-edited {
+    background-color: #fff8e1;
+    border-left: 3px solid #f9a825;
+}
+
+/* ── Fixed-width columns ── */
+.row-number-col {
+    width: 3rem;
+    text-align: center;
+}
+
+.checkbox-col,
+.radio-col {
+    width: 2.5rem;
+    text-align: center;
+}
+
+/* ── Search ── */
+.search-container {
+    max-width: 400px;
+}
+
+.result-count {
+    display: block;
+}
+
+/* ── Inline Edit Inputs ── */
+td lightning-input,
+td lightning-combobox {
+    --sds-c-input-spacing-horizontal-start: 0.25rem;
+    --sds-c-input-spacing-horizontal-end: 0.25rem;
+}

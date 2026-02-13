@@ -1,0 +1,268 @@
+<template>
+    <!-- Header -->
+    <template if:true={hasHeader}>
+        <div class="slds-p-bottom_x-small">
+            <h3 class="slds-text-heading_small">{headerText}</h3>
+        </div>
+    </template>
+
+    <!-- Search Bar -->
+    <template if:true={showSearchBar}>
+        <div class="slds-p-bottom_x-small search-container">
+            <lightning-input
+                type="search"
+                label="Search"
+                variant="label-hidden"
+                placeholder={searchPlaceholder}
+                value={_searchTerm}
+                onchange={handleSearchChange}>
+            </lightning-input>
+            <template if:true={resultCountText}>
+                <span class="slds-text-body_small slds-text-color_weak slds-p-top_xx-small result-count">
+                    {resultCountText}
+                </span>
+            </template>
+        </div>
+    </template>
+
+    <!-- Error State -->
+    <template if:true={_metadataError}>
+        <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+            <span class="slds-assistive-text">error</span>
+            <p>Error loading column metadata: {_metadataError}</p>
+        </div>
+    </template>
+
+    <!-- Loading State -->
+    <template if:false={_metadataLoaded}>
+        <div class="slds-is-relative slds-p-around_large">
+            <lightning-spinner alternative-text="Loading columns" size="small"></lightning-spinner>
+        </div>
+    </template>
+
+    <!-- Table -->
+    <template if:true={hasRecords}>
+        <template if:true={_metadataLoaded}>
+            <div class="table-container" style={tableContainerStyle}>
+                <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered">
+                    <!-- Table Head -->
+                    <thead>
+                        <tr class="slds-line-height_reset">
+                            <!-- Row Number Header -->
+                            <template if:true={showRowNumbers}>
+                                <th class="slds-text-title_caps row-number-col" scope="col">
+                                    <span class="slds-truncate" title="#">#</span>
+                                </th>
+                            </template>
+
+                            <!-- Select All Checkbox (Multi Select) -->
+                            <template if:true={isMultiSelect}>
+                                <th class="slds-text-title_caps checkbox-col" scope="col">
+                                    <div class="slds-th__action slds-th__action_form">
+                                        <lightning-input
+                                            type="checkbox"
+                                            label="Select All"
+                                            variant="label-hidden"
+                                            checked={isAllSelected}
+                                            onchange={handleSelectAll}>
+                                        </lightning-input>
+                                    </div>
+                                </th>
+                            </template>
+
+                            <!-- Radio placeholder (Single Select) -->
+                            <template if:true={isSingleSelect}>
+                                <th class="slds-text-title_caps radio-col" scope="col">
+                                    <span class="slds-truncate" title="Select"></span>
+                                </th>
+                            </template>
+
+                            <!-- Column Headers -->
+                            <template for:each={processedColumns} for:item="col">
+                                <th key={col.key}
+                                    class={col.headerClass}
+                                    scope="col"
+                                    aria-sort={col.ariaSort}
+                                    data-field-name={col.fieldApiName}
+                                    onclick={handleSort}>
+                                    <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                                        <span class="slds-truncate" title={col.label}>{col.label}</span>
+                                        <span class={col.sortClass}>
+                                            <lightning-icon
+                                                icon-name={col.sortIcon}
+                                                size="xx-small"
+                                                alternative-text="Sort">
+                                            </lightning-icon>
+                                        </span>
+                                    </div>
+                                </th>
+                            </template>
+                        </tr>
+                    </thead>
+
+                    <!-- Table Body -->
+                    <tbody>
+                        <template for:each={processedRows} for:item="row">
+                            <tr key={row.key}
+                                class={row.rowClass}
+                                data-record-id={row.recordId}
+                                onclick={handleRowClick}
+                                aria-selected={row.ariaSelected}>
+
+                                <!-- Row Number -->
+                                <template if:true={showRowNumbers}>
+                                    <td class="row-number-col">
+                                        <span class="slds-text-body_small slds-text-color_weak">{row.rowNumber}</span>
+                                    </td>
+                                </template>
+
+                                <!-- Multi Select Checkbox -->
+                                <template if:true={isMultiSelect}>
+                                    <td class="checkbox-col">
+                                        <lightning-input
+                                            type="checkbox"
+                                            label="Select row"
+                                            variant="label-hidden"
+                                            checked={row.isSelected}
+                                            data-record-id={row.recordId}>
+                                        </lightning-input>
+                                    </td>
+                                </template>
+
+                                <!-- Single Select Radio -->
+                                <template if:true={isSingleSelect}>
+                                    <td class="radio-col">
+                                        <span class={row.isSelected}>
+                                            <lightning-input
+                                                type="checkbox"
+                                                label="Select row"
+                                                variant="label-hidden"
+                                                checked={row.isSelected}
+                                                data-record-id={row.recordId}>
+                                            </lightning-input>
+                                        </span>
+                                    </td>
+                                </template>
+
+                                <!-- Data Cells -->
+                                <template for:each={row.cells} for:item="cell">
+                                    <td key={cell.key}
+                                        class={cell.cellClass}
+                                        data-record-id={row.recordId}
+                                        data-field-name={cell.fieldName}
+                                        data-can-edit={cell.canEdit}
+                                        ondblclick={handleCellDblClick}>
+
+                                        <!-- EDITING MODE: Standard input -->
+                                        <template if:true={cell.isEditing}>
+                                            <template if:true={cell.isStandardInput}>
+                                                <lightning-input
+                                                    type={cell.inputType}
+                                                    label={cell.fieldName}
+                                                    variant="label-hidden"
+                                                    value={cell.value}
+                                                    data-record-id={row.recordId}
+                                                    data-field-name={cell.fieldName}
+                                                    onchange={handleCellInputChange}
+                                                    onblur={handleCellInputBlur}
+                                                    onkeydown={handleCellInputKeydown}>
+                                                </lightning-input>
+                                            </template>
+
+                                            <!-- EDITING MODE: Checkbox -->
+                                            <template if:true={cell.isCheckbox}>
+                                                <lightning-input
+                                                    type="checkbox"
+                                                    label={cell.fieldName}
+                                                    variant="label-hidden"
+                                                    checked={cell.value}
+                                                    data-record-id={row.recordId}
+                                                    data-field-name={cell.fieldName}
+                                                    onchange={handleCellInputChange}
+                                                    onblur={handleCellInputBlur}
+                                                    onkeydown={handleCellInputKeydown}>
+                                                </lightning-input>
+                                            </template>
+
+                                            <!-- EDITING MODE: Picklist -->
+                                            <template if:true={cell.isPicklist}>
+                                                <lightning-combobox
+                                                    label={cell.fieldName}
+                                                    variant="label-hidden"
+                                                    value={cell.value}
+                                                    options={cell.picklistOptions}
+                                                    data-record-id={row.recordId}
+                                                    data-field-name={cell.fieldName}
+                                                    onchange={handlePicklistChange}
+                                                    onblur={handleCellInputBlur}
+                                                    onkeydown={handleCellInputKeydown}>
+                                                </lightning-combobox>
+                                            </template>
+                                        </template>
+
+                                        <!-- DISPLAY MODE -->
+                                        <template if:false={cell.isEditing}>
+                                            <div class="cell-display">
+                                                <div class="cell-display-value">
+                                                    <!-- Link (relationship field) -->
+                                                    <template if:true={cell.isLink}>
+                                                        <a href="#"
+                                                           data-link-record-id={cell.linkRecordId}
+                                                           onclick={handleRecordLink}
+                                                           title={cell.displayValue}>
+                                                            {cell.displayValue}
+                                                        </a>
+                                                    </template>
+
+                                                    <!-- Boolean display -->
+                                                    <template if:false={cell.isLink}>
+                                                        <template if:true={cell.isBoolean}>
+                                                            <span title={cell.booleanDisplay}>{cell.booleanDisplay}</span>
+                                                        </template>
+                                                        <template if:false={cell.isBoolean}>
+                                                            <span class="slds-truncate" title={cell.displayValue}>{cell.displayValue}</span>
+                                                        </template>
+                                                    </template>
+                                                </div>
+
+                                                <!-- Pencil icon for editable cells -->
+                                                <template if:true={cell.showPencil}>
+                                                    <lightning-button-icon
+                                                        icon-name="utility:edit"
+                                                        alternative-text="Edit"
+                                                        variant="bare"
+                                                        size="x-small"
+                                                        class="pencil-icon"
+                                                        data-record-id={row.recordId}
+                                                        data-field-name={cell.fieldName}
+                                                        onclick={handlePencilClick}>
+                                                    </lightning-button-icon>
+                                                </template>
+                                            </div>
+                                        </template>
+                                    </td>
+                                </template>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+        </template>
+    </template>
+
+    <!-- Empty State -->
+    <template if:false={hasRecords}>
+        <template if:true={_metadataLoaded}>
+            <div class="slds-p-around_medium slds-text-align_center slds-text-color_weak">
+                <lightning-icon
+                    icon-name="utility:info"
+                    size="small"
+                    alternative-text="No records">
+                </lightning-icon>
+                <p class="slds-m-top_small slds-text-body_regular">
+                    No records to display
+                </p>
+            </div>
+        </template>
+    </template>
+</template>

@@ -1,0 +1,320 @@
+<template>
+    <div class="slds-p-around_small editor-container">
+
+        <!-- Object Type Selection -->
+        <div class="slds-m-bottom_small">
+            <div class="section-header slds-m-bottom_x-small">
+                <h3 class="slds-text-heading_small">Object Type</h3>
+            </div>
+
+            <!-- Selected object badge + Change button -->
+            <template if:true={hasObject}>
+                <template if:false={_showObjectPicker}>
+                    <div class="slds-grid slds-grid_vertical-align-center slds-m-bottom_x-small">
+                        <div class="slds-badge slds-badge_inverse slds-m-right_small">
+                            <lightning-icon icon-name="standard:sobject" size="xx-small" class="slds-m-right_xx-small"></lightning-icon>
+                            {objectLabel}
+                        </div>
+                        <lightning-button label="Change" variant="base" onclick={handleChangeObject}></lightning-button>
+                    </div>
+                </template>
+            </template>
+
+            <!-- Object picker (search + list) -->
+            <template if:true={showObjectPicker}>
+                <template if:true={objectPickerLoading}>
+                    <div class="slds-is-relative slds-p-around_medium">
+                        <lightning-spinner alternative-text="Loading objects" size="small"></lightning-spinner>
+                    </div>
+                </template>
+
+                <template if:true={_sObjectsLoaded}>
+                    <lightning-input
+                        type="search"
+                        label="Search objects"
+                        variant="label-hidden"
+                        placeholder="Search objects..."
+                        value={_objectSearchTerm}
+                        onchange={handleObjectSearch}
+                        class="slds-m-bottom_xx-small">
+                    </lightning-input>
+
+                    <div class="object-picker">
+                        <template if:true={hasFilteredSObjects}>
+                            <template for:each={filteredSObjects} for:item="obj">
+                                <div key={obj.apiName}
+                                     class="field-item"
+                                     data-api-name={obj.apiName}
+                                     onclick={handleSelectObject}
+                                     role="button"
+                                     tabindex="0"
+                                     title={obj.apiName}>
+                                    <lightning-icon icon-name="standard:sobject" size="xx-small" class="slds-m-right_xx-small"></lightning-icon>
+                                    <span class="field-item-label">{obj.label}</span>
+                                    <span class="slds-text-body_small slds-text-color_weak field-item-api">{obj.apiName}</span>
+                                </div>
+                            </template>
+                        </template>
+                        <template if:false={hasFilteredSObjects}>
+                            <p class="slds-text-body_small slds-text-color_weak slds-p-around_x-small">
+                                No matching objects found.
+                            </p>
+                        </template>
+                    </div>
+                </template>
+            </template>
+        </div>
+
+        <template if:true={hasObject}>
+
+            <!-- ─── RECORDS SECTION ─── -->
+            <div class="slds-m-bottom_small">
+                <div class="section-header slds-m-bottom_x-small">
+                    <h3 class="slds-text-heading_small">Records</h3>
+                </div>
+
+                <lightning-input
+                    type="text"
+                    label="Record Collection"
+                    value={_selectedRecordsVariable}
+                    placeholder="Enter a Flow resource name (e.g., Get_Records)"
+                    onchange={handleRecordsChange}>
+                </lightning-input>
+            </div>
+
+            <!-- ─── COLUMNS SECTION ─── -->
+            <div class="slds-m-bottom_small">
+                <div class="section-header slds-m-bottom_x-small">
+                    <h3 class="slds-text-heading_small">{columnCountLabel}</h3>
+                </div>
+
+                <!-- Selected columns list -->
+                <template if:true={hasColumns}>
+                    <div class="column-list">
+                        <template for:each={columns} for:item="col">
+                            <div key={col.id} class="column-row">
+                                <div class="column-row-main">
+                                    <!-- Reorder buttons -->
+                                    <div class="reorder-btns">
+                                        <lightning-button-icon
+                                            icon-name="utility:chevronup"
+                                            alternative-text="Move up"
+                                            data-col-id={col.id}
+                                            onclick={handleMoveUp}
+                                            variant="bare"
+                                            size="small">
+                                        </lightning-button-icon>
+                                        <lightning-button-icon
+                                            icon-name="utility:chevrondown"
+                                            alternative-text="Move down"
+                                            data-col-id={col.id}
+                                            onclick={handleMoveDown}
+                                            variant="bare"
+                                            size="small">
+                                        </lightning-button-icon>
+                                    </div>
+
+                                    <!-- Field info -->
+                                    <div class="column-info">
+                                        <span class="slds-text-body_regular column-label" title={col.label}>{col.label}</span>
+                                        <span class="slds-text-body_small slds-text-color_weak" title={col.fieldApiName}>{col.fieldApiName}</span>
+                                    </div>
+
+                                    <!-- Custom label input -->
+                                    <div class="column-custom-label">
+                                        <lightning-input
+                                            type="text"
+                                            label="Custom Label"
+                                            variant="label-hidden"
+                                            placeholder="Custom label"
+                                            value={col.customLabel}
+                                            data-col-id={col.id}
+                                            onchange={handleCustomLabelChange}>
+                                        </lightning-input>
+                                    </div>
+
+                                    <!-- Allow inline edit checkbox -->
+                                    <template if:true={enableInlineEdit}>
+                                        <div class="column-edit-toggle">
+                                            <lightning-input
+                                                type="checkbox"
+                                                label="Editable"
+                                                checked={col.allowEdit}
+                                                data-col-id={col.id}
+                                                onchange={handleAllowEditChange}>
+                                            </lightning-input>
+                                        </div>
+                                    </template>
+
+                                    <!-- Remove button -->
+                                    <lightning-button-icon
+                                        icon-name="utility:delete"
+                                        alternative-text="Remove column"
+                                        data-col-id={col.id}
+                                        onclick={handleRemoveColumn}
+                                        variant="bare"
+                                        size="medium"
+                                        class="remove-btn">
+                                    </lightning-button-icon>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+
+                <template if:false={hasColumns}>
+                    <p class="slds-text-body_small slds-text-color_weak slds-p-vertical_x-small">
+                        No columns added. Search and click fields below to add them.
+                    </p>
+                </template>
+            </div>
+
+            <!-- ─── ADD FIELDS SECTION ─── -->
+            <div class="slds-m-bottom_small">
+                <div class="section-header slds-m-bottom_x-small">
+                    <h3 class="slds-text-heading_small">Add Fields</h3>
+                </div>
+
+                <!-- Loading state -->
+                <template if:true={fieldsLoading}>
+                    <div class="slds-is-relative slds-p-around_medium">
+                        <lightning-spinner alternative-text="Loading fields" size="small"></lightning-spinner>
+                    </div>
+                </template>
+
+                <!-- Error state -->
+                <template if:true={_fieldsError}>
+                    <p class="slds-text-color_error slds-text-body_small">{_fieldsError}</p>
+                </template>
+
+                <!-- Field picker -->
+                <template if:true={_fieldsLoaded}>
+                    <lightning-input
+                        type="search"
+                        label="Search fields"
+                        variant="label-hidden"
+                        placeholder="Search fields..."
+                        value={_fieldSearchTerm}
+                        onchange={handleFieldSearch}
+                        class="slds-m-bottom_xx-small">
+                    </lightning-input>
+
+                    <div class="field-picker">
+                        <template if:true={hasFilteredFields}>
+                            <template for:each={filteredAvailableFields} for:item="field">
+                                <div key={field.key}
+                                     class="field-item"
+                                     data-field-api-name={field.apiName}
+                                     onclick={handleAddField}
+                                     role="button"
+                                     tabindex="0"
+                                     title={field.displayDetail}>
+                                    <lightning-icon
+                                        icon-name={field.iconName}
+                                        size="xx-small"
+                                        class="slds-m-right_xx-small">
+                                    </lightning-icon>
+                                    <span class="field-item-label">{field.displayLabel}</span>
+                                    <span class="slds-text-body_small slds-text-color_weak field-item-api">{field.apiName}</span>
+                                </div>
+                            </template>
+                        </template>
+                        <template if:false={hasFilteredFields}>
+                            <p class="slds-text-body_small slds-text-color_weak slds-p-around_x-small">
+                                No matching fields found.
+                            </p>
+                        </template>
+                    </div>
+                </template>
+            </div>
+
+            <!-- ─── SETTINGS SECTION ─── -->
+            <div class="slds-m-bottom_small">
+                <div class="section-header slds-m-bottom_x-small">
+                    <h3 class="slds-text-heading_small">Settings</h3>
+                </div>
+
+                <div class="slds-m-bottom_x-small">
+                    <lightning-combobox
+                        name="selectionMode"
+                        label="Selection Mode"
+                        value={selectionMode}
+                        options={selectionModeOptions}
+                        onchange={handleSelectionModeChange}>
+                    </lightning-combobox>
+                </div>
+
+                <div class="slds-m-bottom_x-small">
+                    <lightning-input
+                        type="checkbox"
+                        label="Enable Inline Editing"
+                        checked={enableInlineEdit}
+                        onchange={handleInlineEditChange}>
+                    </lightning-input>
+                </div>
+
+                <div class="slds-m-bottom_x-small">
+                    <lightning-input
+                        type="number"
+                        label="Visible Rows"
+                        value={visibleRows}
+                        min="1"
+                        max="100"
+                        onchange={handleVisibleRowsChange}>
+                    </lightning-input>
+                </div>
+
+                <div class="slds-m-bottom_x-small">
+                    <lightning-input
+                        type="checkbox"
+                        label="Show Search"
+                        checked={showSearch}
+                        onchange={handleShowSearchChange}>
+                    </lightning-input>
+                </div>
+
+                <div class="slds-m-bottom_x-small">
+                    <lightning-input
+                        type="checkbox"
+                        label="Show Row Numbers"
+                        checked={showRowNumbers}
+                        onchange={handleShowRowNumbersChange}>
+                    </lightning-input>
+                </div>
+
+                <div class="slds-m-bottom_x-small">
+                    <lightning-input
+                        type="text"
+                        label="Header Text"
+                        value={headerText}
+                        placeholder="Optional table header"
+                        onchange={handleHeaderTextChange}>
+                    </lightning-input>
+                </div>
+
+                <div class="slds-m-bottom_x-small">
+                    <lightning-input
+                        type="number"
+                        label="Header Font Size (px)"
+                        value={headerFontSize}
+                        min="8"
+                        max="32"
+                        onchange={handleHeaderFontSizeChange}>
+                    </lightning-input>
+                </div>
+
+                <div class="slds-m-bottom_x-small">
+                    <lightning-input
+                        type="number"
+                        label="Row Font Size (px)"
+                        value={rowFontSize}
+                        min="8"
+                        max="32"
+                        onchange={handleRowFontSizeChange}>
+                    </lightning-input>
+                </div>
+            </div>
+
+        </template>
+    </div>
+</template>

@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>63.0</apiVersion>
+    <isExposed>true</isExposed>
+    <masterLabel>Flow Datatable</masterLabel>
+    <description>A configurable datatable for Screen Flows. Supports any object, view/single/multi-select modes, inline editing, relationship field links, search filtering, and column sorting.</description>
+    <targets>
+        <target>lightning__FlowScreen</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightning__FlowScreen" configurationEditor="c-flow-datatable-editor">
+            <!-- Generic type: Flow Builder will prompt admin to select the object -->
+            <propertyType name="T" extends="SObject" label="Object Type"
+                description="The Salesforce object type for the record collection" />
+
+            <!-- Input: Record collection -->
+            <property name="records"
+                      type="{T[]}"
+                      role="inputOnly"
+                      label="Records"
+                      description="Collection of records to display in the table"
+                      required="true" />
+
+            <!-- Input: Object API Name (auto-set by CPE from generic type) -->
+            <property name="objectApiName"
+                      type="String"
+                      role="inputOnly"
+                      label="Object API Name"
+                      description="Auto-populated by the editor from the selected object type." />
+
+            <!-- Input: Field API names for columns (set by CPE) -->
+            <property name="fieldNames"
+                      type="String"
+                      role="inputOnly"
+                      label="Field API Names"
+                      description="Comma-separated field API names for columns"
+                      default="Name" />
+
+            <!-- Input: Custom column labels (set by CPE) -->
+            <property name="columnLabels"
+                      type="String"
+                      role="inputOnly"
+                      label="Custom Column Labels"
+                      description="Comma-separated custom labels to override Schema labels" />
+
+            <!-- Input: Editable fields (set by CPE) -->
+            <property name="editableFields"
+                      type="String"
+                      role="inputOnly"
+                      label="Editable Fields"
+                      description="Comma-separated field API names that allow inline editing" />
+
+            <!-- Input: Selection mode -->
+            <property name="selectionMode"
+                      type="String"
+                      role="inputOnly"
+                      label="Selection Mode"
+                      description="View Only, Single Select, or Multi Select"
+                      default="View Only" />
+
+            <!-- Input: Enable inline editing -->
+            <property name="enableInlineEdit"
+                      type="Boolean"
+                      role="inputOnly"
+                      label="Enable Inline Editing"
+                      description="Allow editing cell values in View Only mode"
+                      default="false" />
+
+            <!-- Input: Visible rows -->
+            <property name="visibleRows"
+                      type="Integer"
+                      role="inputOnly"
+                      label="Visible Rows"
+                      description="Number of rows visible before scrolling"
+                      default="10" />
+
+            <!-- Input: Show search -->
+            <property name="showSearch"
+                      type="Boolean"
+                      role="inputOnly"
+                      label="Show Search"
+                      description="Display a search box to filter table rows"
+                      default="true" />
+
+            <!-- Input: Header text -->
+            <property name="headerText"
+                      type="String"
+                      role="inputOnly"
+                      label="Header Text"
+                      description="Optional heading displayed above the table" />
+
+            <!-- Input: Show row numbers -->
+            <property name="showRowNumbers"
+                      type="Boolean"
+                      role="inputOnly"
+                      label="Show Row Numbers"
+                      description="Display a row number column"
+                      default="false" />
+
+            <!-- Input: Header font size -->
+            <property name="headerFontSize"
+                      type="String"
+                      role="inputOnly"
+                      label="Header Font Size (px)"
+                      description="Font size for column headers in pixels. Defaults to 12."
+                      default="12" />
+
+            <!-- Input: Row font size -->
+            <property name="rowFontSize"
+                      type="String"
+                      role="inputOnly"
+                      label="Row Font Size (px)"
+                      description="Font size for data rows in pixels. Defaults to 13."
+                      default="13" />
+
+            <!-- Output: Selected records -->
+            <property name="selectedRecords"
+                      type="{T[]}"
+                      role="outputOnly"
+                      label="Selected Records (Output)"
+                      description="Currently selected records" />
+
+            <!-- Output: Edited records -->
+            <property name="editedRecords"
+                      type="{T[]}"
+                      role="outputOnly"
+                      label="Edited Records (Output)"
+                      description="Records modified via inline edit" />
+
+            <!-- Output: Selected count -->
+            <property name="selectedCount"
+                      type="Integer"
+                      role="outputOnly"
+                      label="Selected Count (Output)"
+                      description="Number of currently selected records" />
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>
